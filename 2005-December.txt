@@ -1,0 +1,41 @@
+From pietrobo at pietrobo.com  Tue Dec  6 12:17:17 2005
+From: pietrobo at pietrobo.com (Marco Pietrobono)
+Date: Tue, 06 Dec 2005 12:17:17 +0100
+Subject: [Dbfw-users] First public release of our framework (v. 1.0)
+Message-ID: <1133867837.6183.5.camel@luggage.pietrobo.com>
+
+  Hi all,
+
+  so it seems that the time has come...
+
+  I've just put on our new official project home page the first public
+archive of the framework, tagged as version 1.0.
+
+  there are still some missing informations, but I hope to be able to
+add them in the new few days.
+
+  let me know how this will work out,
+
+  bye,
+
+/pietrobo
+
+
+-- 
+Stud. Marco Pietrobono             | Murphy's Law: if something can
+v. del Calice, 39 - 00178 ROMA     |     go wrong, it will do.
+Tel. +39.067186329  +39.3397410893 | Legge di Murphy: se qualcosa puo'
+http://www.pietrobo.com            |     andar male, lo fara'.
+------------------------------------------------------------------------
+Strange game.
+The only winning move
+is not to play.
+What about a nice play of chess ?
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 189 bytes
+Desc: This is a digitally signed message part
+URL: <https://lists.berlios.de/pipermail/dbfw-users/attachments/20051206/2def5915/attachment.pgp>
+

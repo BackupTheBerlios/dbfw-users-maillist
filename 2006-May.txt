@@ -1,0 +1,259 @@
+From loade at loade.com  Mon May 15 18:31:42 2006
+From: loade at loade.com (Loreno Edelmondo)
+Date: Mon, 15 May 2006 18:31:42 +0200
+Subject: [Dbfw-users] Information
+Message-ID: <1147710702.4468acee8a5fb@cp.tophost.it>
+
+Hello Marco,
+I write to you in order to ask an aid to you, I am using DBFW 1.1.2.
+I have two tables:
+SERVER --------< EVENT
+with one relation 1:N
+in the file public.server.xml I have created one structure as this:
+
+<?xml version='1.0' encoding="UTF-8" ?>
+
+<module>
+  <schema name="public">
+  <table name="server" label="Scheda server">
+  <form>
+     <field name="Fevent" type="form" form="public.event.fk_event" min="1"
+max="20" />
+     <template>
+        <tbody>
+           <tr>
+              <th colspan="4">Aggiungi evento</th>
+           </tr>
+           <tr>
+              <td colspan="4">{Fevent}</td>
+           </tr>
+             .
+             .
+             .
+        </tbody>
+      </template>
+   </form>
+   </table>
+   </schema>
+   </module>
+
+In the file public.event.xml I created the template of the form to make to
+appear in the server card
+
+<?xml version='1.0' encoding="UTF-8" ?>
+<module>
+  <schema name="public">
+    <table name="event" label="Event">
+      <form name="fk_event">
+        <field name="descrizione" widget="textarea" width="35" height="5" />
+        <field name="note_event" widget="textarea" width="35" height="5" />
+                <template>
+                        <tbody>
+                                <tr>
+                                      <th>Descrizione * </th>
+                                      <td>{descrizione}</td>
+                                      <td width="20"></td>
+                                      <th>Note</th>
+                                      <td>{note_event}</td>
+                                </tr>
+                        </tbody>
+                </template>
+      </form>
+      </table>
+      </schema>
+      </module>
+
+I ask to you as I can make to personalize in the modification operation the
+fields Description and Notes of the form fk_event so that the previously
+inserted records are not modifiable, but they can be only inserted of the new
+ones.
+
+In more I have tried to insert the default to the inside of
+
+<column name="num_cpu" type="integer" default="2">
+  <data key="1" value="1" />
+  <data key="2" value="2" />
+          .
+          .
+          .
+</column>
+
+the same thing I have made with:
+
+<field name="num_cpu" widget="select" default="2" />
+
+but I am not successful to set up the value of default I would have intentional.
+
+Thanks, Loreno
+
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  loade at loade.com |    www.loade.com
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    GNU/Linux     | Tel. +39.3281212557
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+?Il copyleft ha lo scopo di incoraggiare le persone a cooperare e ad aiutarsi
+reciprocamente, e a dare a tutti la stessa libert?.?
+Richard Stallman
+
+----------------------------------------------------------------
+This message was sent using IMP, the Internet Messaging Program.
+
+
+
+From pietrobo at pietrobo.com  Tue May 16 19:33:18 2006
+From: pietrobo at pietrobo.com (Marco Pietrobono)
+Date: Tue, 16 May 2006 19:33:18 +0200
+Subject: [Dbfw-users] Information
+In-Reply-To: <1147710702.4468acee8a5fb@cp.tophost.it>
+References: <1147710702.4468acee8a5fb@cp.tophost.it>
+Message-ID: <1147800798.3534.49.camel@luggage.pietrobo.com>
+
+Il giorno lun, 15/05/2006 alle 18.31 +0200, Loreno Edelmondo ha scritto:
+> Hello Marco,
+
+  Hi Loreno, sorry for the delay in my answer... I've been a bit busy...
+
+> I write to you in order to ask an aid to you, I am using DBFW 1.1.2.
+> I have two tables:
+> SERVER --------< EVENT
+> with one relation 1:N
+> in the file public.server.xml I have created one structure as this:
+> 
+> <?xml version='1.0' encoding="UTF-8" ?>
+> 
+> <module>
+>   <schema name="public">
+>   <table name="server" label="Scheda server">
+>   <form>
+>      <field name="Fevent" type="form" form="public.event.fk_event" min="1"
+> max="20" />
+[snip]
+
+> In the file public.event.xml I created the template of the form to make to
+> appear in the server card
+> 
+> <?xml version='1.0' encoding="UTF-8" ?>
+> <module>
+>   <schema name="public">
+>     <table name="event" label="Event">
+>       <form name="fk_event">
+>         <field name="descrizione" widget="textarea" width="35" height="5" />
+>         <field name="note_event" widget="textarea" width="35" height="5" />
+[snip]
+
+> I ask to you as I can make to personalize in the modification operation the
+> fields Description and Notes of the form fk_event so that the previously
+> inserted records are not modifiable, but they can be only inserted of the new
+> ones.
+
+  This is one of those case where you need to expand the default
+behaviour of the form using the form's handlers. In your case, you
+simply need to add a "post_retrieve" handler to your main form.
+
+  you may try something like this:
+
+-------- 8< -------- 8< -------------   XML file
+
+<module>
+  <schema name="public">
+  <table name="server" label="Scheda server">
+  <form>
+     <field name="Fevent" type="form"
+                          form="public.event.fk_event"
+                          min="1" max="20" />
+     <handler name="post_retrieve" function="server_post_retrieve" />
+
+-------- 8< -------- 8< -------------   XML file
+
+  the function server_post_retrieve can be the following one:
+
+-------- 8< -------- 8< -------------   index.php file
+
+function    server_post_retrieve   (&$form)
+ {
+    // first, we need to retrieve the FieldForm that contains the
+    // embedded form
+    $field =& $form->GetField( 'Fevent' );
+
+    // then we need to remove all instances in excess
+    $n = count( $field->instances );
+    $max = NVL( $field->GetOption('max'), 20 );
+    for ( $i = $n-1 ; $i >= $max-1 ; $i-- )
+        $field->RemoveInstance( $i );
+
+    // now we need to mark all retrieved instances as fixed
+    for ( $i = 0; $i < count($field->instances); $i++ )
+        $field->instances[$i]->SetType('fixed');
+
+    // last, we need to add a new empty instance
+    $field->AddInstance( $form->data, array() );
+ }
+
+-------- 8< -------- 8< -------------   index.php file
+
+  To make this work as expected you need to add a default order by to
+the event table, something like:
+
+<table name="event">
+  <order_by name="byID" label="By ID">
+    <sorting_rule column="id" order="desc" />
+  </order_by>
+</table>
+
+  'cause otherwise you will not be able to reliably show the list of the
+last N events to the user, since the very same list will be mostly
+randomly generated by the DB.
+
+  I've just prepared a small fix to allow the enforcing of the
+"max" option directly in the retrieve phase of the form's activities
+plan, too.
+
+> In more I have tried to insert the default to the inside of
+> 
+> <column name="num_cpu" type="integer" default="2">
+>   <data key="1" value="1" />
+>   <data key="2" value="2" />
+>           .
+>           .
+>           .
+> </column>
+> 
+> the same thing I have made with:
+> 
+> <field name="num_cpu" widget="select" default="2" />
+> 
+> but I am not successful to set up the value of default I would have intentional.
+> 
+> Thanks, Loreno
+[snip]
+
+  mmmhhh... ok, it seems that currently the default value specified
+using the field's "default" attribute is used only on text widgets. I've
+just applied a fix that extends this behaviour to all widgets.
+
+  I'll release a new version of the framework in the next few days, as
+soon as I'll complete the new Wizard and User Preferences subsystems.
+
+  bye,
+
+/pietrobo
+
+-- 
+Stud. Marco Pietrobono             | Murphy's Law: if something can
+v. del Calice, 39 - 00178 ROMA     |     go wrong, it will do.
+Tel. +39.067186329  +39.3397410893 | Legge di Murphy: se qualcosa puo'
+http://www.pietrobo.com            |     andar male, lo fara'.
+------------------------------------------------------------------------
+Strange game.
+The only winning move
+is not to play.
+What about a nice play of chess ?
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 189 bytes
+Desc: Questa ? una parte del messaggio	firmata digitalmente
+URL: <https://lists.berlios.de/pipermail/dbfw-users/attachments/20060516/17d2b678/attachment.pgp>
+

@@ -1,0 +1,205 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Dbfw-users] Information
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/dbfw-users/2006-May/index.html" >
+   <LINK REL="made" HREF="mailto:dbfw-users%40lists.berlios.de?Subject=Re%3A%20%5BDbfw-users%5D%20Information&In-Reply-To=%3C1147800798.3534.49.camel%40luggage.pietrobo.com%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000001.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Dbfw-users] Information</H1>
+    <B>Marco Pietrobono</B> 
+    <A HREF="mailto:dbfw-users%40lists.berlios.de?Subject=Re%3A%20%5BDbfw-users%5D%20Information&In-Reply-To=%3C1147800798.3534.49.camel%40luggage.pietrobo.com%3E"
+       TITLE="[Dbfw-users] Information">pietrobo at pietrobo.com
+       </A><BR>
+    <I>Tue May 16 19:33:18 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000001.html">[Dbfw-users] Information
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#2">[ date ]</a>
+              <a href="thread.html#2">[ thread ]</a>
+              <a href="subject.html#2">[ subject ]</a>
+              <a href="author.html#2">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Il giorno lun, 15/05/2006 alle 18.31 +0200, Loreno Edelmondo ha scritto:
+&gt;<i> Hello Marco,
+</I>
+  Hi Loreno, sorry for the delay in my answer... I've been a bit busy...
+
+&gt;<i> I write to you in order to ask an aid to you, I am using DBFW 1.1.2.
+</I>&gt;<i> I have two tables:
+</I>&gt;<i> SERVER --------&lt; EVENT
+</I>&gt;<i> with one relation 1:N
+</I>&gt;<i> in the file public.server.xml I have created one structure as this:
+</I>&gt;<i> 
+</I>&gt;<i> &lt;?xml version='1.0' encoding=&quot;UTF-8&quot; ?&gt;
+</I>&gt;<i> 
+</I>&gt;<i> &lt;module&gt;
+</I>&gt;<i>   &lt;schema name=&quot;public&quot;&gt;
+</I>&gt;<i>   &lt;table name=&quot;server&quot; label=&quot;Scheda server&quot;&gt;
+</I>&gt;<i>   &lt;form&gt;
+</I>&gt;<i>      &lt;field name=&quot;Fevent&quot; type=&quot;form&quot; form=&quot;public.event.fk_event&quot; min=&quot;1&quot;
+</I>&gt;<i> max=&quot;20&quot; /&gt;
+</I>[snip]
+
+&gt;<i> In the file public.event.xml I created the template of the form to make to
+</I>&gt;<i> appear in the server card
+</I>&gt;<i> 
+</I>&gt;<i> &lt;?xml version='1.0' encoding=&quot;UTF-8&quot; ?&gt;
+</I>&gt;<i> &lt;module&gt;
+</I>&gt;<i>   &lt;schema name=&quot;public&quot;&gt;
+</I>&gt;<i>     &lt;table name=&quot;event&quot; label=&quot;Event&quot;&gt;
+</I>&gt;<i>       &lt;form name=&quot;fk_event&quot;&gt;
+</I>&gt;<i>         &lt;field name=&quot;descrizione&quot; widget=&quot;textarea&quot; width=&quot;35&quot; height=&quot;5&quot; /&gt;
+</I>&gt;<i>         &lt;field name=&quot;note_event&quot; widget=&quot;textarea&quot; width=&quot;35&quot; height=&quot;5&quot; /&gt;
+</I>[snip]
+
+&gt;<i> I ask to you as I can make to personalize in the modification operation the
+</I>&gt;<i> fields Description and Notes of the form fk_event so that the previously
+</I>&gt;<i> inserted records are not modifiable, but they can be only inserted of the new
+</I>&gt;<i> ones.
+</I>
+  This is one of those case where you need to expand the default
+behaviour of the form using the form's handlers. In your case, you
+simply need to add a &quot;post_retrieve&quot; handler to your main form.
+
+  you may try something like this:
+
+-------- 8&lt; -------- 8&lt; -------------   XML file
+
+&lt;module&gt;
+  &lt;schema name=&quot;public&quot;&gt;
+  &lt;table name=&quot;server&quot; label=&quot;Scheda server&quot;&gt;
+  &lt;form&gt;
+     &lt;field name=&quot;Fevent&quot; type=&quot;form&quot;
+                          form=&quot;public.event.fk_event&quot;
+                          min=&quot;1&quot; max=&quot;20&quot; /&gt;
+     &lt;handler name=&quot;post_retrieve&quot; function=&quot;server_post_retrieve&quot; /&gt;
+
+-------- 8&lt; -------- 8&lt; -------------   XML file
+
+  the function server_post_retrieve can be the following one:
+
+-------- 8&lt; -------- 8&lt; -------------   index.php file
+
+function    server_post_retrieve   (&amp;$form)
+ {
+    // first, we need to retrieve the FieldForm that contains the
+    // embedded form
+    $field =&amp; $form-&gt;GetField( 'Fevent' );
+
+    // then we need to remove all instances in excess
+    $n = count( $field-&gt;instances );
+    $max = NVL( $field-&gt;GetOption('max'), 20 );
+    for ( $i = $n-1 ; $i &gt;= $max-1 ; $i-- )
+        $field-&gt;RemoveInstance( $i );
+
+    // now we need to mark all retrieved instances as fixed
+    for ( $i = 0; $i &lt; count($field-&gt;instances); $i++ )
+        $field-&gt;instances[$i]-&gt;SetType('fixed');
+
+    // last, we need to add a new empty instance
+    $field-&gt;AddInstance( $form-&gt;data, array() );
+ }
+
+-------- 8&lt; -------- 8&lt; -------------   index.php file
+
+  To make this work as expected you need to add a default order by to
+the event table, something like:
+
+&lt;table name=&quot;event&quot;&gt;
+  &lt;order_by name=&quot;byID&quot; label=&quot;By ID&quot;&gt;
+    &lt;sorting_rule column=&quot;id&quot; order=&quot;desc&quot; /&gt;
+  &lt;/order_by&gt;
+&lt;/table&gt;
+
+  'cause otherwise you will not be able to reliably show the list of the
+last N events to the user, since the very same list will be mostly
+randomly generated by the DB.
+
+  I've just prepared a small fix to allow the enforcing of the
+&quot;max&quot; option directly in the retrieve phase of the form's activities
+plan, too.
+
+&gt;<i> In more I have tried to insert the default to the inside of
+</I>&gt;<i> 
+</I>&gt;<i> &lt;column name=&quot;num_cpu&quot; type=&quot;integer&quot; default=&quot;2&quot;&gt;
+</I>&gt;<i>   &lt;data key=&quot;1&quot; value=&quot;1&quot; /&gt;
+</I>&gt;<i>   &lt;data key=&quot;2&quot; value=&quot;2&quot; /&gt;
+</I>&gt;<i>           .
+</I>&gt;<i>           .
+</I>&gt;<i>           .
+</I>&gt;<i> &lt;/column&gt;
+</I>&gt;<i> 
+</I>&gt;<i> the same thing I have made with:
+</I>&gt;<i> 
+</I>&gt;<i> &lt;field name=&quot;num_cpu&quot; widget=&quot;select&quot; default=&quot;2&quot; /&gt;
+</I>&gt;<i> 
+</I>&gt;<i> but I am not successful to set up the value of default I would have intentional.
+</I>&gt;<i> 
+</I>&gt;<i> Thanks, Loreno
+</I>[snip]
+
+  mmmhhh... ok, it seems that currently the default value specified
+using the field's &quot;default&quot; attribute is used only on text widgets. I've
+just applied a fix that extends this behaviour to all widgets.
+
+  I'll release a new version of the framework in the next few days, as
+soon as I'll complete the new Wizard and User Preferences subsystems.
+
+  bye,
+
+/pietrobo
+
+-- 
+Stud. Marco Pietrobono             | Murphy's Law: if something can
+v. del Calice, 39 - 00178 ROMA     |     go wrong, it will do.
+Tel. +39.067186329  +39.3397410893 | Legge di Murphy: se qualcosa puo'
+<A HREF="http://www.pietrobo.com">http://www.pietrobo.com</A>            |     andar male, lo fara'.
+------------------------------------------------------------------------
+Strange game.
+The only winning move
+is not to play.
+What about a nice play of chess ?
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: signature.asc
+Type: application/pgp-signature
+Size: 189 bytes
+Desc: Questa ? una parte del messaggio	firmata digitalmente
+URL: &lt;<A HREF="https://lists.berlios.de/pipermail/dbfw-users/attachments/20060516/17d2b678/attachment.pgp">https://lists.berlios.de/pipermail/dbfw-users/attachments/20060516/17d2b678/attachment.pgp</A>&gt;
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000001.html">[Dbfw-users] Information
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#2">[ date ]</a>
+              <a href="thread.html#2">[ thread ]</a>
+              <a href="subject.html#2">[ subject ]</a>
+              <a href="author.html#2">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/dbfw-users">More information about the Dbfw-users
+mailing list</a><br>
+</body></html>

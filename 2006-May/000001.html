@@ -1,0 +1,154 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Dbfw-users] Information
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/dbfw-users/2006-May/index.html" >
+   <LINK REL="made" HREF="mailto:dbfw-users%40lists.berlios.de?Subject=Re%3A%20%5BDbfw-users%5D%20Information&In-Reply-To=%3C1147710702.4468acee8a5fb%40cp.tophost.it%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000002.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Dbfw-users] Information</H1>
+    <B>Loreno Edelmondo</B> 
+    <A HREF="mailto:dbfw-users%40lists.berlios.de?Subject=Re%3A%20%5BDbfw-users%5D%20Information&In-Reply-To=%3C1147710702.4468acee8a5fb%40cp.tophost.it%3E"
+       TITLE="[Dbfw-users] Information">loade at loade.com
+       </A><BR>
+    <I>Mon May 15 18:31:42 CEST 2006</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000002.html">[Dbfw-users] Information
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1">[ date ]</a>
+              <a href="thread.html#1">[ thread ]</a>
+              <a href="subject.html#1">[ subject ]</a>
+              <a href="author.html#1">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Hello Marco,
+I write to you in order to ask an aid to you, I am using DBFW 1.1.2.
+I have two tables:
+SERVER --------&lt; EVENT
+with one relation 1:N
+in the file public.server.xml I have created one structure as this:
+
+&lt;?xml version='1.0' encoding=&quot;UTF-8&quot; ?&gt;
+
+&lt;module&gt;
+  &lt;schema name=&quot;public&quot;&gt;
+  &lt;table name=&quot;server&quot; label=&quot;Scheda server&quot;&gt;
+  &lt;form&gt;
+     &lt;field name=&quot;Fevent&quot; type=&quot;form&quot; form=&quot;public.event.fk_event&quot; min=&quot;1&quot;
+max=&quot;20&quot; /&gt;
+     &lt;template&gt;
+        &lt;tbody&gt;
+           &lt;tr&gt;
+              &lt;th colspan=&quot;4&quot;&gt;Aggiungi evento&lt;/th&gt;
+           &lt;/tr&gt;
+           &lt;tr&gt;
+              &lt;td colspan=&quot;4&quot;&gt;{Fevent}&lt;/td&gt;
+           &lt;/tr&gt;
+             .
+             .
+             .
+        &lt;/tbody&gt;
+      &lt;/template&gt;
+   &lt;/form&gt;
+   &lt;/table&gt;
+   &lt;/schema&gt;
+   &lt;/module&gt;
+
+In the file public.event.xml I created the template of the form to make to
+appear in the server card
+
+&lt;?xml version='1.0' encoding=&quot;UTF-8&quot; ?&gt;
+&lt;module&gt;
+  &lt;schema name=&quot;public&quot;&gt;
+    &lt;table name=&quot;event&quot; label=&quot;Event&quot;&gt;
+      &lt;form name=&quot;fk_event&quot;&gt;
+        &lt;field name=&quot;descrizione&quot; widget=&quot;textarea&quot; width=&quot;35&quot; height=&quot;5&quot; /&gt;
+        &lt;field name=&quot;note_event&quot; widget=&quot;textarea&quot; width=&quot;35&quot; height=&quot;5&quot; /&gt;
+                &lt;template&gt;
+                        &lt;tbody&gt;
+                                &lt;tr&gt;
+                                      &lt;th&gt;Descrizione * &lt;/th&gt;
+                                      &lt;td&gt;{descrizione}&lt;/td&gt;
+                                      &lt;td width=&quot;20&quot;&gt;&lt;/td&gt;
+                                      &lt;th&gt;Note&lt;/th&gt;
+                                      &lt;td&gt;{note_event}&lt;/td&gt;
+                                &lt;/tr&gt;
+                        &lt;/tbody&gt;
+                &lt;/template&gt;
+      &lt;/form&gt;
+      &lt;/table&gt;
+      &lt;/schema&gt;
+      &lt;/module&gt;
+
+I ask to you as I can make to personalize in the modification operation the
+fields Description and Notes of the form fk_event so that the previously
+inserted records are not modifiable, but they can be only inserted of the new
+ones.
+
+In more I have tried to insert the default to the inside of
+
+&lt;column name=&quot;num_cpu&quot; type=&quot;integer&quot; default=&quot;2&quot;&gt;
+  &lt;data key=&quot;1&quot; value=&quot;1&quot; /&gt;
+  &lt;data key=&quot;2&quot; value=&quot;2&quot; /&gt;
+          .
+          .
+          .
+&lt;/column&gt;
+
+the same thing I have made with:
+
+&lt;field name=&quot;num_cpu&quot; widget=&quot;select&quot; default=&quot;2&quot; /&gt;
+
+but I am not successful to set up the value of default I would have intentional.
+
+Thanks, Loreno
+
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  <A HREF="https://lists.berlios.de/mailman/listinfo/dbfw-users">loade at loade.com</A> |    www.loade.com
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    GNU/Linux     | Tel. +39.3281212557
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+&#171;Il copyleft ha lo scopo di incoraggiare le persone a cooperare e ad aiutarsi
+reciprocamente, e a dare a tutti la stessa libert&#224;.&#187;
+Richard Stallman
+
+----------------------------------------------------------------
+This message was sent using IMP, the Internet Messaging Program.
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000002.html">[Dbfw-users] Information
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1">[ date ]</a>
+              <a href="thread.html#1">[ thread ]</a>
+              <a href="subject.html#1">[ subject ]</a>
+              <a href="author.html#1">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/dbfw-users">More information about the Dbfw-users
+mailing list</a><br>
+</body></html>
